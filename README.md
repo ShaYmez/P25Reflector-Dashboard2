@@ -147,6 +147,13 @@ Ensure your P25Reflector is configured to write logs:
 FilePath=/var/log/P25Reflector/
 FileRoot=P25Reflector
 ```
+While your in P25Reflector.ini add Info section to display on your dash header
+
+```ini
+[Info]
+Id=23426 # Change to your P25 Talkgroup
+Name=FreeSTAR # Change to your P25 Reflector name
+```
 
 ### Dashboard Settings
 

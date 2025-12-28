@@ -139,9 +139,17 @@ sudo systemctl reload nginx
 
 ### 6. Initial Setup
 
-1. Open your browser and navigate to `http://your-domain.com/setup.php`
+1. Edit your P25Refector.ini and add Info section
 
-2. Fill in the configuration form:
+```ini
+[Info]
+Id=23426 # Change to your P25 Talkgroup
+Name=FreeSTAR # Change to your P25 Reflector name
+```
+
+2. Open your browser and navigate to `http://your-domain.com/setup.php`
+
+3. Fill in the configuration form:
 
    **Dashboard Branding:**
    - Dashboard Name: Your reflector name
@@ -160,9 +168,9 @@ sudo systemctl reload nginx
    - Set refresh interval (default: 60 seconds)
    - Configure other options as needed
 
-3. Click "Save Configuration"
+4. Click "Save Configuration"
 
-4. **IMPORTANT:** Delete setup.php for security:
+5. **IMPORTANT:** Delete setup.php for security:
    ```bash
    sudo rm /var/www/html/P25Reflector-Dashboard2/setup.php
    ```

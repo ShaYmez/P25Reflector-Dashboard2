@@ -20,6 +20,14 @@ Version 2.0.1 Official
 - **Privacy Options** - GDPR-compliant callsign anonymization
 - **QRZ Integration** - Optional links to QRZ.com for callsigns
 
+## Screenshots
+
+### Running Dashboard
+![P25Reflector-Dashboard2 Screenshot](./assets/ss/img/Screenshot-2025.png)
+- [LIVE!](https://p25.freestar.network)
+
+*Dashboard showing real-time connection with P25Reflector, including connected repeaters, system information, and last heard list*
+
 ## Installation
 
 ### Requirements
@@ -121,6 +129,8 @@ sudo systemctl restart nginx
 ```
 
 ### Step 5: Initial Setup
+
+![Setup Wizard](./assets/ss/img/Screenshotss-2025.png)
 
 1. Open your browser and navigate to `http://your-domain.com/setup.php`
 2. Fill in the configuration form:

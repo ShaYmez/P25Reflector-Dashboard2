@@ -1,0 +1,21 @@
+{
+  "name": "p25reflector-dashboard2",
+  "version": "2.0.1",
+  "description": "Modern P25Reflector Dashboard for P25Reflector",
+  "scripts": {
+    "build:css": "npx tailwindcss -i ./src/styles.css -o ./assets/css/output.css --minify",
+    "watch:css": "npx tailwindcss -i ./src/styles.css -o ./assets/css/output.css --watch",
+    "dev": "npm run watch:css"
+  },
+  "keywords": [
+    "p25",
+    "reflector",
+    "dashboard",
+    "amateur-radio"
+  ],
+  "author": "ShaYmez",
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "tailwindcss": "3.4.0"
+  }
+}

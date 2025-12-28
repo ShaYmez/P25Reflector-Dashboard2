@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900;
+    @apply min-h-screen text-white;
+  }
+}
+
+@layer components {
+  .card-glossy {
+    @apply bg-white/10 backdrop-blur-md rounded-2xl shadow-glossy border border-white/20;
+    @apply transition-all duration-300 hover:shadow-glossy-sm hover:bg-white/15;
+  }
+  
+  .btn-primary {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700;
+    @apply text-white font-semibold py-3 px-6 rounded-xl shadow-lg;
+    @apply transition-all duration-300 transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20;
+    @apply text-white font-semibold py-3 px-6 rounded-xl shadow-lg;
+    @apply transition-all duration-300;
+  }
+  
+  .input-glossy {
+    @apply bg-white/5 backdrop-blur-md border border-white/20 rounded-lg;
+    @apply text-white placeholder-white/50 px-4 py-3;
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+    @apply transition-all duration-300;
+  }
+  
+  .table-glossy {
+    @apply w-full text-left;
+  }
+  
+  .table-glossy thead {
+    @apply bg-white/10 backdrop-blur-md;
+  }
+  
+  .table-glossy th {
+    @apply px-6 py-4 text-sm font-semibold uppercase tracking-wider;
+  }
+  
+  .table-glossy td {
+    @apply px-6 py-4 border-b border-white/10;
+  }
+  
+  .table-glossy tbody tr {
+    @apply hover:bg-white/5 transition-colors duration-200;
+  }
+}

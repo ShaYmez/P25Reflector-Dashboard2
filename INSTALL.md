@@ -204,6 +204,7 @@ sudo certbot --nginx -d your-domain.com -d www.your-domain.com  # For Nginx
 - Verify P25Reflector is running: `systemctl status p25reflector`
 - Check log file path in config
 - Ensure web server has read permissions on log files
+- Dated logs (`P25Reflector-YYYY-MM-DD.log`) and logrotate (`P25Reflector.log`) are both supported
 
 ### Setup page won't create config.php
 

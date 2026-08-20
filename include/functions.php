@@ -106,8 +106,70 @@ function getConfigItem($section, $key, $configs) {
     return '';
 }
 
+/**
+ * Resolve the reflector log file for dated G4KLX logs, logrotate (PREFIX.log),
+ * or the newest PREFIX-*.log. Do not glob PREFIX*.log — that would match
+ * other FileRoot names in the same directory (e.g. P25ReflectorCHATTERBOX).
+ */
+function resolveReflectorLogFile($logDir, $logPrefix) {
+    $logDir = rtrim($logDir, "/\\");
+    $dated = $logDir . "/" . $logPrefix . "-" . date("Y-m-d") . ".log";
+    if (is_readable($dated)) {
+        return $dated;
+    }
+    $plain = $logDir . "/" . $logPrefix . ".log";
+    if (is_readable($plain)) {
+        return $plain;
+    }
+    $matches = glob($logDir . "/" . $logPrefix . "-*.log");
+    if ($matches) {
+        usort($matches, function ($a, $b) {
+            return filemtime($b) - filemtime($a);
+        });
+        foreach ($matches as $file) {
+            if (is_readable($file)) {
+                return $file;
+            }
+        }
+    }
+    return $dated;
+}
+
+function parseLinkedPeerLine($logLine) {
+    $timestamp = substr($logLine, 3, 19);
+    $rest = trim(substr($logLine, 27));
+    if (preg_match('/^([A-Za-z0-9\/\-]+)\s*:\s*(\S+)/', $rest, $m)) {
+        return array(
+            'callsign' => $m[1],
+            'timestamp' => $timestamp,
+            'ipport' => $m[2]
+        );
+    }
+    return array(
+        'callsign' => trim(substr($logLine, 31, 10)),
+        'timestamp' => $timestamp,
+        'ipport' => trim(substr($logLine, 31))
+    );
+}
+
+function addUniqueLinkedPeer(&$peers, $peer) {
+    $callsign = trim($peer['callsign']);
+    if ($callsign === '') {
+        return;
+    }
+    foreach ($peers as $existing) {
+        if (trim($existing['callsign']) === $callsign) {
+            return;
+        }
+        if (!empty($peer['ipport']) && $existing['ipport'] === $peer['ipport']) {
+            return;
+        }
+    }
+    $peers[] = $peer;
+}
+
 function getP25ReflectorLog() {
-    $logPath = P25REFLECTORLOGPATH."/".P25REFLECTORLOGPREFIX."-".date("Y-m-d").".log";
+    $logPath = resolveReflectorLogFile(P25REFLECTORLOGPATH, P25REFLECTORLOGPREFIX);
     $logLines = array();
     if (file_exists($logPath) && is_readable($logPath)) {
         if ($log = fopen($logPath, 'r')) {
@@ -373,21 +435,15 @@ function getLinkedGateways($logLines) {
         if (strpos($logLine, "No repeaters linked")) {
             return $gateways;
         }
-        if (strpos($logLine, "Currently linked repeaters")) {
-            for ($j = $i+1; $j < count($logLines); $j++) {
-                $logLine = $logLines[$j];
-                if (!startsWith(substr($logLine,27), "   ")) {
-                    return $gateways;
-                } else {
-                    $timestamp = substr($logLine, 3, 19);
-                    $callsign = substr($logLine, 31, 10);
-                    $ipport = substr($logLine,31);
-                    $key = searchForKey("ipport",$ipport, $gateways);
-                    if ($key === NULL) {
-                        array_push($gateways, Array('callsign'=>$callsign,'timestamp'=>$timestamp,'ipport'=>$ipport));
-                    }
+        if (strpos($logLine, "Currently linked repeaters") !== false) {
+            for ($j = $i + 1; $j < count($logLines); $j++) {
+                $peerLine = $logLines[$j];
+                if (!startsWith(substr($peerLine, 27), "   ")) {
+                    break;
                 }
+                addUniqueLinkedPeer($gateways, parseLinkedPeerLine($peerLine));
             }
+            return $gateways;
         }
     }
     return $gateways;

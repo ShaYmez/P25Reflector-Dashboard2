@@ -39,7 +39,7 @@ $sysInfo = getSystemInfo();
 $diskInfo = getDiskInfo();
 
 // Version info
-define("VERSION", "2.0.1");
+define("VERSION", "2.0.2");
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,7 +53,6 @@ define("VERSION", "2.0.1");
     <title><?php echo htmlspecialchars(defined("DASHBOARD_NAME") ? DASHBOARD_NAME : "P25 Reflector Dashboard", ENT_QUOTES, 'UTF-8'); ?> - <?php echo htmlspecialchars(getConfigItem("Info", "Name", $configs), ENT_QUOTES, 'UTF-8'); ?></title>
     
     <link rel="stylesheet" href="assets/css/output.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <!-- Animated Background -->
@@ -124,7 +123,7 @@ define("VERSION", "2.0.1");
                 <div class="flex-1">
                     <div class="flex items-center mb-2">
                         <span class="inline-block w-3 h-3 bg-red-500 rounded-full mr-3 animate-pulse"></span>
-                        <h2 class="text-3xl font-bold text-red-400">TRANSMITTING..</h2>
+                        <h2 class="text-3xl font-bold text-red-400">TRANSMITTING...</h2>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                         <div>
@@ -470,7 +469,7 @@ define("VERSION", "2.0.1");
                         <div class="flex-1">
                             <div class="flex items-center mb-2">
                                 <span class="inline-block w-3 h-3 bg-red-500 rounded-full mr-3 animate-pulse"></span>
-                                <h2 class="text-3xl font-bold text-red-400">TRANSMITTING..</h2>
+                                <h2 class="text-3xl font-bold text-red-400">TRANSMITTING...</h2>
                             </div>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                                 <div>

@@ -2,7 +2,7 @@
 
 Modern web application dashboard for viewing connected repeaters, active users, and system statistics for P25Reflector.
 
-Version 2.0.1 Official
+Version 2.0.2 Official
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-7.4%20%7C%208.x-purple.svg)

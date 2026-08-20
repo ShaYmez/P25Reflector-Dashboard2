@@ -2,7 +2,7 @@
 
 Modern web application dashboard for viewing connected repeaters, active users, and system statistics for P25Reflector.
 
-Version 2.0.2 Official
+Version 2.0.3 Official
 
 ![License](https://img.shields.io/badge/license-GPL--3.0-blue.svg)
 ![PHP](https://img.shields.io/badge/PHP-7.4%20%7C%208.x-purple.svg)
@@ -78,7 +78,7 @@ Create a virtual host configuration:
     DocumentRoot /var/www/html/P25Reflector-Dashboard2
     
     <Directory /var/www/html/P25Reflector-Dashboard2>
-        Options Indexes FollowSymLinks
+        Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
@@ -181,7 +181,7 @@ define("DASHBOARD_NAME", "My P25 Reflector");
 define("LOGO", "https://example.com/logo.png"); // URL or local path
 ```
 
-**Note**: The `REFRESHAFTER` setting is now deprecated as the dashboard uses JavaScript for live updates and no longer requires page refreshes.
+**Note**: `REFRESHAFTER`, `SHOWOLDMHEARD`, and `SHOWPROGRESSBARS` are unused (live poll is 5 seconds). Optional layout: `LAST_HEARD_FIRST`, `SHOW_SYSTEM_INFO` — see INSTALL.md. Default branch is **master**.
 
 ### Logo Configuration
 
@@ -279,7 +279,7 @@ To update the dashboard:
 
 ```bash
 cd /var/www/html/P25Reflector-Dashboard2
-git pull origin main
+sudo git pull origin master
 npm install
 npm run build:css
 ```

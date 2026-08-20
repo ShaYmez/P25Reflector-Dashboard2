@@ -2,7 +2,7 @@
 /**
  * P25Reflector-Dashboard2 by M0VUB Aka ShaYmez - Main Dashboard
  * Responsive dashboard for P25Reflector
- * Copyright (C) 2025  Shane Daley, M0VUB Aka. ShaYmez
+ * Copyright (C) 2025-2026  Shane Daley, M0VUB Aka. ShaYmez
  */
 
 $time = microtime();
@@ -20,6 +20,7 @@ if (!file_exists("config/config.php")) {
 include "config/config.php";
 include "include/tools.php";
 include "include/functions.php";
+include "include/seo.php";
 
 // Initialize data
 $configs = getP25ReflectorConfig();
@@ -39,19 +40,23 @@ $sysInfo = getSystemInfo();
 $diskInfo = getDiskInfo();
 
 // Version info
-define("VERSION", "2.0.2");
+define("VERSION", "2.0.3");
+$name = defined("DASHBOARD_NAME") ? DASHBOARD_NAME : "P25 Reflector Dashboard";
+$tagline = defined("DASHBOARD_TAGLINE") ? DASHBOARD_TAGLINE : "Modern Dashboard for Amateur Radio";
+$infoName = getConfigItem("Info", "Name", $configs);
+$pageTitle = $name . (!empty($infoName) ? " - ".$infoName : " - P25");
+$description = $name . (!empty($tagline) ? " — ".$tagline : "") . ". Live P25Reflector dashboard for amateur radio: linked gateways, last heard activity, and host system status.";
+$lastHeardFirst = defined("LAST_HEARD_FIRST") && LAST_HEARD_FIRST;
+$showSystemInfo = !defined("SHOW_SYSTEM_INFO") || SHOW_SYSTEM_INFO;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="P25Reflector-Dashboard V2">
-    <meta name="author" content="M0VUB Aka ShaYmez">
     <meta http-equiv="expires" content="0">
-    
-    <title><?php echo htmlspecialchars(defined("DASHBOARD_NAME") ? DASHBOARD_NAME : "P25 Reflector Dashboard", ENT_QUOTES, 'UTF-8'); ?> - <?php echo htmlspecialchars(getConfigItem("Info", "Name", $configs), ENT_QUOTES, 'UTF-8'); ?></title>
-    
+    <title><?php echo htmlspecialchars($pageTitle, ENT_QUOTES, 'UTF-8'); ?></title>
+    <?php renderSeoHead($pageTitle, $description, $name); ?>
     <link rel="stylesheet" href="assets/css/output.css">
 </head>
 <body>
@@ -229,8 +234,9 @@ define("VERSION", "2.0.2");
             </div>
         </div>
 
+        <?php ob_start(); ?>
         <!-- Main Content Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div class="grid grid-cols-1 <?php echo $showSystemInfo ? 'lg:grid-cols-2' : ''; ?> gap-8 mb-8">
             <!-- Connected Gateways -->
             <div class="card-glossy p-6">
                 <h2 class="text-2xl font-bold mb-6 flex items-center">
@@ -269,6 +275,7 @@ define("VERSION", "2.0.2");
                 </div>
             </div>
 
+            <?php if ($showSystemInfo) { ?>
             <!-- System Information -->
             <div class="card-glossy p-6">
                 <h2 class="text-2xl font-bold mb-6 flex items-center">
@@ -304,8 +311,11 @@ define("VERSION", "2.0.2");
                     </div>
                 </div>
             </div>
+            <?php } ?>
         </div>
+        <?php $listsHtml = ob_get_clean(); ?>
 
+        <?php ob_start(); ?>
         <!-- Last Heard List -->
         <div class="card-glossy p-6 mb-8">
             <h2 class="text-2xl font-bold mb-6 flex items-center">
@@ -361,6 +371,10 @@ define("VERSION", "2.0.2");
                 </table>
             </div>
         </div>
+        <?php
+        $lastHeardHtml = ob_get_clean();
+        echo $lastHeardFirst ? ($lastHeardHtml . $listsHtml) : ($listsHtml . $lastHeardHtml);
+        ?>
 
         <!-- Footer -->
         <div class="card-glossy p-6 text-center">
@@ -378,7 +392,7 @@ define("VERSION", "2.0.2");
                 ?>
             </div>
             <div class="mt-3">
-                <a href="https://github.com/ShaYmez/P25Reflector-Dashboard2" target="_blank" class="text-blue-400 hover:text-blue-300 underline text-sm">
+                <a href="https://github.com/ShaYmez/P25Reflector-Dashboard2" target="_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 underline text-sm">
                     Get your own at GitHub
                 </a>
             </div>

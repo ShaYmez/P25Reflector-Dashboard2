@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.0.3] - 2026-08-20
+
+### Added
+- SEO/AI: unique meta description, Open Graph, JSON-LD, `robots.txt`, `llms.txt`, `sitemap.php`, favicon.
+- Layout options for community operators: `LAST_HEARD_FIRST` and `SHOW_SYSTEM_INFO` (defaults keep the current layout).
+- Public INSTALL rewritten for independent P25Reflector hosts (virtual host, HTTPS, `master` branch, git ownership).
+
+### Changed
+- Apache examples disable directory indexes and deny `/config` and `/.git`.
+
+### Removed
+- Unused `api/tx_status.php`.
+
+---
+
 ## [2.0.2] - 2026-08-20
 
 ### Fixed

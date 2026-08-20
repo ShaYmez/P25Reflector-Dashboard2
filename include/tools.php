@@ -2,7 +2,7 @@
 /**
  * P25Reflector-Dashboard2 - Tools and Helper Functions
  * Modern dashboard for P25Reflector
- * Copyright (C) 2025  Shane Daley, M0VUB Aka. ShaYmez
+ * Copyright (C) 2025-2026  Shane Daley, M0VUB Aka. ShaYmez
  */
 
 function format_time($seconds) {

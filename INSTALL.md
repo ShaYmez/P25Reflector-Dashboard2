@@ -1,49 +1,25 @@
-# Installation Guide
+# P25Reflector-Dashboard2 — Installation Guide
 
-## Quick Start
-
-This guide will help you install and configure P25Reflector-Dashboard2 on your server.
+For **your own** G4KLX P25Reflector (any talkgroup, any host). This is the official Dashboard2 used on FreeSTAR and by independent reflector operators.
 
 ## Prerequisites
 
-- Linux server (Debian/Ubuntu recommended)
-- PHP >= 7.4 (tested with PHP 7.4, 8.0, 8.1, 8.2, and 8.3)
-- Node.js >= 16.x
-- Web server (Apache or Nginx)
-- P25Reflector installed and running
+- Linux (Debian/Ubuntu recommended)
+- Working **P25Reflector** (G4KLX)
+- PHP 7.4–8.3 (`php`, `php-cli`, `php-mbstring`)
+- Node.js >= 16.x (to build CSS once)
+- Apache or Nginx
+- Git
 
-### PHP Compatibility
-
-This dashboard is fully compatible with:
-- PHP 7.4 (minimum required version)
-- PHP 8.0, 8.1, 8.2, 8.3 (tested and confirmed)
-
-All deprecated functions have been replaced with PHP 8+ compatible alternatives.
-
-## Step-by-Step Installation
-
-### 1. Install Dependencies
-
-#### On Debian/Ubuntu:
+## 1. Install packages (Debian/Ubuntu)
 
 ```bash
-# Update system
-sudo apt update && sudo apt upgrade -y
-
-# Install PHP and required extensions
-sudo apt install -y php php-cli php-fpm php-json php-mbstring
-
-# Install Node.js (if not already installed)
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Install Apache or Nginx
-sudo apt install -y apache2  # For Apache
-# OR
-sudo apt install -y nginx php-fpm  # For Nginx
+sudo apt update
+sudo apt install -y apache2 php php-cli php-mbstring php-xml git nodejs npm
+# or: sudo apt install -y nginx php-fpm php-cli php-mbstring git nodejs npm
 ```
 
-### 2. Download Dashboard
+## 2. Clone
 
 ```bash
 cd /var/www/html
@@ -51,191 +27,170 @@ sudo git clone https://github.com/ShaYmez/P25Reflector-Dashboard2.git
 cd P25Reflector-Dashboard2
 ```
 
-### 3. Build Assets
+Default branch is **`master`**.
+
+## 3. Build CSS
 
 ```bash
-npm install
-npm run build:css
+sudo npm install
+sudo npm run build:css
 ```
 
-### 4. Set Permissions IMPORTANT!!
+## 4. Permissions
 
 ```bash
 sudo chown -R www-data:www-data /var/www/html/P25Reflector-Dashboard2
 sudo chmod -R 755 /var/www/html/P25Reflector-Dashboard2
+sudo mkdir -p /var/www/html/P25Reflector-Dashboard2/config
+sudo chown www-data:www-data /var/www/html/P25Reflector-Dashboard2/config
+sudo chmod 775 /var/www/html/P25Reflector-Dashboard2/config
 ```
 
-### 5. Configure Web Server
+Replace `www-data` with `apache` / `nginx` if needed. **Do not use `chmod 777`.**
 
-#### Apache Configuration
+## 5. Virtual host
+
+### Apache
 
 Create `/etc/apache2/sites-available/p25-dashboard.conf`:
 
 ```apache
 <VirtualHost *:80>
-    ServerName your-domain.com
-    ServerAlias www.your-domain.com
-    
+    ServerName p25.yourdomain.com
     DocumentRoot /var/www/html/P25Reflector-Dashboard2
-    
+
     <Directory /var/www/html/P25Reflector-Dashboard2>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
     </Directory>
-    
+
+    <Directory /var/www/html/P25Reflector-Dashboard2/config>
+        Require all denied
+    </Directory>
+    <Directory /var/www/html/P25Reflector-Dashboard2/.git>
+        Require all denied
+    </Directory>
+
     ErrorLog ${APACHE_LOG_DIR}/p25-dashboard-error.log
     CustomLog ${APACHE_LOG_DIR}/p25-dashboard-access.log combined
 </VirtualHost>
 ```
-
-Enable the site:
 
 ```bash
 sudo a2ensite p25-dashboard
 sudo systemctl reload apache2
 ```
 
-#### Nginx Configuration
+Point DNS (or a hosts file) at this server, then open `http://p25.yourdomain.com/setup.php`.
+
+### Nginx
 
 Create `/etc/nginx/sites-available/p25-dashboard`:
 
 ```nginx
 server {
     listen 80;
-    server_name your-domain.com www.your-domain.com;
-    
+    server_name p25.yourdomain.com;
     root /var/www/html/P25Reflector-Dashboard2;
     index index.php index.html;
-    
+
     location / {
         try_files $uri $uri/ =404;
     }
-    
+
     location ~ \.php$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        include fastcgi_params;
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
     }
-    
-    location ~ /\.ht {
+
+    location ~ /\.(git|ht) {
         deny all;
     }
-    
-    location ~ /config/ {
+
+    location ^~ /config/ {
+        deny all;
+    }
+
+    location ^~ /include/ {
         deny all;
     }
 }
 ```
 
-Enable the site:
+Adjust the PHP-FPM socket to your version (`php7.4-fpm.sock`, `php8.3-fpm.sock`, …).
 
 ```bash
 sudo ln -s /etc/nginx/sites-available/p25-dashboard /etc/nginx/sites-enabled/
-sudo nginx -t
-sudo systemctl reload nginx
+sudo nginx -t && sudo systemctl reload nginx
 ```
 
-### 6. Initial Setup
+## 6. Setup wizard
 
-1. Edit your P25Refector.ini and add Info section
+1. Browse to `http://p25.yourdomain.com/setup.php`
+2. Set dashboard name, tagline, logo, log path, and `P25Reflector.ini` path
+3. Save, then **delete setup.php**:
+
+```bash
+sudo rm /var/www/html/P25Reflector-Dashboard2/setup.php
+```
+
+P25Reflector logs (dated or logrotate) are both supported:
+
+```ini
+[Log]
+FilePath=/var/log/P25Reflector/
+FileRoot=P25Reflector
+FileRotate=1
+```
+
+The web user must be able to **read** that directory.
+
+Add an `[Info]` section to `P25Reflector.ini` so the header can show name and TG:
 
 ```ini
 [Info]
-Id=23426 # Change to your P25 Talkgroup
-Name=FreeSTAR # Change to your P25 Reflector name
+Id=23426
+Name=My P25 Reflector
+Description=Optional text
 ```
 
-2. Open your browser and navigate to `http://your-domain.com/setup.php`
-
-3. Fill in the configuration form:
-
-   **Dashboard Branding:**
-   - Dashboard Name: Your reflector name
-   - Dashboard Tagline: Custom tagline
-   - Logo URL: (optional) URL to your logo image or drop image file in /img
-
-   **P25Reflector Configuration:**
-   - Path to Log Files: `/var/log/P25Reflector/`
-   - Log File Prefix: `P25Reflector`
-   - Path to P25Reflector.ini: `/etc/`
-   - P25Reflector.ini Filename: `P25Reflector.ini`
-   - Path to Executable: `/usr/local/bin/`
-
-   **Global Settings:**
-   - Select your timezone
-   - Set refresh interval (default: 60 seconds)
-   - Configure other options as needed
-
-4. Click "Save Configuration"
-
-5. **IMPORTANT:** Delete setup.php for security:
-   ```bash
-   sudo rm /var/www/html/P25Reflector-Dashboard2/setup.php
-   ```
-
-### 7. Verify Installation
-
-Navigate to `http://your-domain.com/index.php` to see your dashboard.
-
-## SSL/HTTPS Configuration (Recommended)
-
-### Using Let's Encrypt (Certbot)
+## HTTPS
 
 ```bash
-# Install Certbot
-sudo apt install -y certbot python3-certbot-apache  # For Apache
-# OR
-sudo apt install -y certbot python3-certbot-nginx  # For Nginx
-
-# Obtain certificate
-sudo certbot --apache -d your-domain.com -d www.your-domain.com  # For Apache
-# OR
-sudo certbot --nginx -d your-domain.com -d www.your-domain.com  # For Nginx
-
-# Auto-renewal is configured automatically
+sudo apt install -y certbot python3-certbot-apache   # or python3-certbot-nginx
+sudo certbot --apache -d p25.yourdomain.com
 ```
-
-## Troubleshooting
-
-### Dashboard shows "No repeaters connected"
-
-- Verify P25Reflector is running: `systemctl status p25reflector`
-- Check log file path in config
-- Ensure web server has read permissions on log files
-- Dated logs (`P25Reflector-YYYY-MM-DD.log`) and logrotate (`P25Reflector.log`) are both supported
-
-### Setup page won't create config.php
-
-- Check directory permissions: `ls -la /var/www/html/P25Reflector-Dashboard2/`
-- Ensure www-data has write access
-
-### PHP errors
-
-- Check PHP error log: `tail -f /var/log/apache2/error.log` or `/var/log/nginx/error.log`
-- Verify PHP version: `php -v` (must be >= 7.4)
-
-### CSS not loading properly
-
-- Rebuild CSS: `npm run build:css`
-- Clear browser cache
-- Check file permissions on assets/css/output.css
 
 ## Updating
 
-To update the dashboard:
+Always pull **`master`** as the owner of the clone (usually root), then restore `www-data` ownership. That avoids `fatal: detected dubious ownership` and `cannot open '.git/FETCH_HEAD': Permission denied`.
 
 ```bash
 cd /var/www/html/P25Reflector-Dashboard2
-git pull origin main
-npm install
-npm run build:css
+sudo git pull origin master
+sudo npm install
+sudo npm run build:css
 sudo chown -R www-data:www-data .
+sudo rm -f setup.php
+```
+
+If git still complains about ownership:
+
+```bash
+sudo git config --global --add safe.directory /var/www/html/P25Reflector-Dashboard2
+```
+
+## Layout options (`config/config.php`)
+
+Live tables refresh every 5 seconds in the browser (`REFRESHAFTER` is unused).
+
+```php
+define("LAST_HEARD_FIRST", true);   // last heard above linked list
+define("SHOW_SYSTEM_INFO", false);  // hide uptime / load panel
 ```
 
 ## Support
 
-For issues or questions:
-- GitHub Issues: https://github.com/ShaYmez/P25Reflector-Dashboard2/issues
-- Check the README.md for more information
+- Issues: https://github.com/ShaYmez/P25Reflector-Dashboard2/issues
+- Live example: https://p25.freestar.network

@@ -1,0 +1,26 @@
+# P25Reflector-Dashboard2 — community installs should keep this file.
+# Allow search engines and AI crawlers to read the live dashboard HTML.
+User-agent: *
+Allow: /
+
+Disallow: /config/
+Disallow: /include/
+Disallow: /setup.php
+Disallow: /api/
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+Sitemap: sitemap.php

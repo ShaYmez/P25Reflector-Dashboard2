@@ -1,0 +1,10 @@
+# P25Reflector-Dashboard2
+
+> Live status dashboard for G4KLX P25Reflector amateur-radio talkgroups.
+
+This website is a web dashboard operators install next to P25Reflector. It shows linked P25 gateways, last-heard callsigns, the current transmitter, and host CPU/disk stats. It is not a radio and does not carry voice traffic.
+
+- Project: https://github.com/ShaYmez/P25Reflector-Dashboard2
+- License: GPL-3.0
+- Typical page: connected gateways, last heard, system information
+- Config lives in /config/ (not public) after setup.php is removed

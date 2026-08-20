@@ -2,7 +2,7 @@
 /**
  * P25Reflector-Dashboard2 - Setup Page
  * Initial configuration for P25Reflector Dashboard
- * Copyright (C) 2025  Shane Daley, M0VUB Aka. ShaYmez
+ * Copyright (C) 2025-2026  Shane Daley, M0VUB Aka. ShaYmez
  * REMOVE THIS FILE AFTER SETUP IS COMPLETE!
  */
 
@@ -21,6 +21,8 @@ if (!defined("TEMPERATUREALERT")) define("TEMPERATUREALERT", "");
 if (!defined("TEMPERATUREHIGHLEVEL")) define("TEMPERATUREHIGHLEVEL", "60");
 if (!defined("SHOWQRZ")) define("SHOWQRZ", "");
 if (!defined("GDPR")) define("GDPR", "");
+if (!defined("LAST_HEARD_FIRST")) define("LAST_HEARD_FIRST", "");
+if (!defined("SHOW_SYSTEM_INFO")) define("SHOW_SYSTEM_INFO", "1");
 if (!defined("DASHBOARD_NAME")) define("DASHBOARD_NAME", "P25 Reflector Dashboard");
 if (!defined("DASHBOARD_TAGLINE")) define("DASHBOARD_TAGLINE", "Modern Dashboard for Amateur Radio");
 
@@ -46,7 +48,9 @@ function createConfigLines() {
         "SHOWPROGRESSBARS" => "string",
         "TEMPERATUREALERT" => "string",
         "SHOWQRZ" => "string",
-        "GDPR" => "string"
+        "GDPR" => "string",
+        "LAST_HEARD_FIRST" => "string",
+        "SHOW_SYSTEM_INFO" => "string"
     ];
     
     foreach($_GET as $key=>$val) { 
@@ -69,6 +73,12 @@ function createConfigLines() {
             } else {
                 $out .= "define(\"".addslashes($key)."\", \"".addslashes($sanitizedVal)."\");"."\n";
             }
+        }
+    }
+    $checkboxes = ["SHOWPROGRESSBARS", "TEMPERATUREALERT", "SHOWQRZ", "GDPR", "LAST_HEARD_FIRST", "SHOW_SYSTEM_INFO"];
+    foreach ($checkboxes as $cb) {
+        if (strpos($out, 'define("'.$cb.'"') === false) {
+            $out .= 'define("'.$cb.'", false);'."\n";
         }
     }
     return $out;
@@ -256,15 +266,16 @@ function createConfigLines() {
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold mb-2">Refresh Interval (seconds)</label>
+                                <label class="block text-sm font-semibold mb-2">Refresh Interval (unused)</label>
                                 <input type="number" name="REFRESHAFTER" value="<?php echo constant("REFRESHAFTER") ?>" 
                                        class="input-glossy w-full" placeholder="15" required>
-                                <p class="text-xs text-white/60 mt-1">Default: 15 seconds. Lower values provide more responsive updates.</p>
+                                <p class="text-xs text-white/60 mt-1">Kept for compatibility. The dashboard polls every 5 seconds in JavaScript.</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-semibold mb-2">Historic Logs (days)</label>
+                                <label class="block text-sm font-semibold mb-2">Historic Logs (unused)</label>
                                 <input type="number" name="SHOWOLDMHEARD" value="<?php echo constant("SHOWOLDMHEARD") ?>" 
                                        class="input-glossy w-full" placeholder="7" required>
+                                <p class="text-xs text-white/60 mt-1">Kept for compatibility. Only today's log is read.</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-2">Temperature Warning Level (°C)</label>
@@ -277,7 +288,7 @@ function createConfigLines() {
                         <div class="mt-8 space-y-4">
                             <label class="flex items-center space-x-3 cursor-pointer">
                                 <input type="checkbox" name="SHOWPROGRESSBARS" class="w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-2 focus:ring-blue-500" <?php if (defined("SHOWPROGRESSBARS") && constant("SHOWPROGRESSBARS")) echo "checked" ?>>
-                                <span class="text-sm font-medium">Show Progress Bars</span>
+                                <span class="text-sm font-medium">Show Progress Bars (unused)</span>
                             </label>
                             <label class="flex items-center space-x-3 cursor-pointer">
                                 <input type="checkbox" name="TEMPERATUREALERT" class="w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-2 focus:ring-blue-500" <?php if (defined("TEMPERATUREALERT") && constant("TEMPERATUREALERT")) echo "checked" ?>>
@@ -286,6 +297,14 @@ function createConfigLines() {
                             <label class="flex items-center space-x-3 cursor-pointer">
                                 <input type="checkbox" name="SHOWQRZ" class="w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-2 focus:ring-blue-500" <?php if (defined("SHOWQRZ") && constant("SHOWQRZ")) echo "checked" ?>>
                                 <span class="text-sm font-medium">Show QRZ.com Links on Callsigns</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" name="LAST_HEARD_FIRST" class="w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-2 focus:ring-blue-500" <?php if (defined("LAST_HEARD_FIRST") && constant("LAST_HEARD_FIRST")) echo "checked" ?>>
+                                <span class="text-sm font-medium">Show Last Heard above the linked list</span>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer">
+                                <input type="checkbox" name="SHOW_SYSTEM_INFO" class="w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-2 focus:ring-blue-500" <?php if (!defined("SHOW_SYSTEM_INFO") || constant("SHOW_SYSTEM_INFO")) echo "checked" ?>>
+                                <span class="text-sm font-medium">Show System Information panel</span>
                             </label>
                             <label class="flex items-center space-x-3 cursor-pointer">
                                 <input type="checkbox" name="GDPR" class="w-5 h-5 rounded border-white/20 bg-white/5 text-blue-600 focus:ring-2 focus:ring-blue-500" <?php if (defined("GDPR") && constant("GDPR")) echo "checked" ?>>
